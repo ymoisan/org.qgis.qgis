@@ -262,9 +262,12 @@
                 },
                 {
                     "name" : "pyqt5",
-                    "config-opts" : [
-                        "--disable-static",
-                        "--enable-x11"
+                    "buildsystem" : "simple",
+                    "build-commands" : [
+                        "sip-build --confirm-license --no-make --no-designer-plugin --no-qml-plugin",
+                        "cd build && make -j ${FLATPAK_BUILDER_N_JOBS:-`nproc`} && make install INSTALL_ROOT=${FLATPAK_DEST}/potato",
+                        "cp -rv ${FLATPAK_DEST}/potato/usr/* /app",
+                        "rm -rf ${FLATPAK_DEST}/potato"
                     ],
                     "build-options":{
                         "env":{
@@ -274,37 +277,115 @@
                     "sources" : [
                         {
                             "type" : "archive",
-                            "url" : "https://files.pythonhosted.org/packages/1d/31/896dc3dfb6c81c70164019a6cbba6ab037e3af7653d9ca60ccc874ee4c27/PyQt5-5.15.1.tar.gz",
+                            "url" : "https://pypi.python.org/packages/source/P/PyQt5/PyQt5-5.15.1.tar.gz",
                             "sha256" : "d9a76b850246d08da9863189ecb98f6c2aa9b4d97a3e85e29330a264aed0f9a1"
-                        },
-                        {
-                            "type": "script",
-                            "commands": [
-                                "python3 configure.py --assume-shared --confirm-license --no-designer-plugin --no-qml-plugin --sysroot=/app --qsci-api --qsci-api-destdir=/app/qsci --sipdir=/app/share/sip --sip=/app/bin/sip --sip-incdir=/app/include QMAKE_CFLAGS_RELEASE='-I/usr/include/python3.8/' QMAKE_CXXFLAGS_RELEASE='-I/usr/include/python3.8/'"
-                            ],
-                            "dest-filename": "configure"
                         }
                     ],
                     "modules" : [
                         {
                             "name" : "sip",
+                            "buildsystem" : "simple",
+                            "build-commands" : [
+                                "python3 setup.py build",
+                                "python3 setup.py install --prefix=/app --root=/"
+                            ],
                             "sources" : [
                                 {
                                     "type" : "archive",
-                                    "url" : "https://www.riverbankcomputing.com/static/Downloads/sip/4.19.24/sip-4.19.24.tar.gz",
-                                    "sha256" : "edcd3790bb01938191eef0f6117de0bf56d1136626c0ddb678f3a558d62e41e5"
-                                },
-                                {
-                                    "type": "script",
-                                    "commands": [
-                                        "python3 configure.py --sip-module PyQt5.sip -b ${FLATPAK_DEST}/bin -d ${FLATPAK_DEST}/lib/python3.8/site-packages -e ${FLATPAK_DEST}/include -v ${FLATPAK_DEST}/share/sip --stubsdir=${FLATPAK_DEST}/lib/python3.8/site-packages"
-                                    ],
-                                    "dest-filename": "configure"
+                                    "url" : "https://pypi.python.org/packages/source/s/sip/sip-5.4.0.tar.gz",
+                                    "sha256" : "4282ab45948674f5ef74278a8e70d1302f65c95b519a0af19409002f5715d641"
                                 }
                             ],
                             "cleanup" : [
                                 "/bin",
                                 "/include"
+                            ]
+                        },
+                        {
+                            "name" : "packaging",
+                            "buildsystem" : "simple",
+                            "build-commands" : [
+                                "python3 setup.py build",
+                                "python3 setup.py install --prefix=/app --root=/"
+                            ],
+                            "sources" : [
+                                {
+                                    "type" : "archive",
+                                    "url" : "https://pypi.python.org/packages/source/p/packaging/packaging-20.4.tar.gz",
+                                    "sha256" : "4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"
+                                }
+                            ],
+                            "cleanup" : [
+                                "*"
+                            ]
+                        },
+                        {
+                            "name" : "pyparsing",
+                            "buildsystem" : "simple",
+                            "build-commands" : [
+                                "python3 setup.py build",
+                                "python3 setup.py install --prefix=/app --root=/"
+                            ],
+                            "sources" : [
+                                {
+                                    "type" : "archive",
+                                    "url" : "https://pypi.python.org/packages/source/p/pyparsing/pyparsing-2.4.7.tar.gz",
+                                    "sha256" : "c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"
+                                }
+                            ]
+                        },
+                        {
+                            "name" : "toml",
+                            "buildsystem" : "simple",
+                            "build-commands" : [
+                                "python3 setup.py build",
+                                "python3 setup.py install --prefix=/app --root=/"
+                            ],
+                            "sources" : [
+                                {
+                                    "type" : "archive",
+                                    "url" : "https://pypi.python.org/packages/source/t/toml/toml-0.10.2.tar.gz",
+                                    "sha256" : "b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"
+                                }
+                            ],
+                            "cleanup" : [
+                                "*"
+                            ]
+                        },
+                        {
+                            "name" : "setuptools",
+                            "buildsystem" : "simple",
+                            "build-commands" : [
+                                "python3 setup.py build",
+                                "python3 setup.py install --prefix=/app --root=/"
+                            ],
+                            "sources" : [
+                                {
+                                    "type" : "archive",
+                                    "url" : "https://pypi.python.org/packages/source/P/PyQt-builder/PyQt-builder-1.5.0.tar.gz",
+                                    "sha256" : "11bbe26e8e3d5ffec6d2ef2f50596b1670eb2d8b49aee0f859821922d8282841"
+                                }
+                            ],
+                            "cleanup" : [
+                                "*"
+                            ]
+                        },
+                        {
+                            "name" : "pyqt5-sip",
+                            "buildsystem" : "simple",
+                            "build-commands" : [
+                                "python3 setup.py build",
+                                "python3 setup.py install --prefix=/app --root=/"
+                            ],
+                            "sources" : [
+                                {
+                                    "type" : "archive",
+                                    "url" : "https://pypi.python.org/packages/source/P/PyQt5-sip/PyQt5_sip-12.8.1.tar.gz",
+                                    "sha256" : "30e944db9abee9cc757aea16906d4198129558533eb7fadbe48c5da2bd18e0bd"
+                                }
+                            ],
+                            "cleanup" : [
+                                "*"
                             ]
                         }
                     ]
@@ -326,10 +407,12 @@
                         "sed -e 's|\\(qsci.path\\) = .*|\\1 = /app/share/qt5|' -i Qt4Qt5/qscintilla.pro",
                         "sed -e 's|\\(features.path\\) = .*|\\1 = /app/lib/qt5/mkspecs/features|' -i Qt4Qt5/qscintilla.pro",
                         "sed -e \"s|qmake = {'CONFIG': 'qscintilla2'}|qmake = {'CONFIG': 'qscintilla2', 'QT': 'widgets printsupport'}|\" -i Python/configure.py",
-                        "cd Qt4Qt5 && qmake && make -j ${FLATPAK_BUILDER_N_JOBS:-`nproc`} && make install",
-                        "cd Python && python3 configure.py --pyqt=PyQt5 -n ../Qt4Qt5/ -o ../Qt4Qt5/ --pyqt-sipdir=/app/share/sip --destdir=/app/lib/python3.8/site-packages/PyQt5 --apidir=/app/qsci/api/python --no-stubs --no-dist-info",
-                        "echo \"LIBS += /app/lib/libqscintilla2_qt5.so\" >> Python/Qsci/Qsci.pro",
-                        "cd Python && make -j ${FLATPAK_BUILDER_N_JOBS:-`nproc`} && make install"
+                        "cd Qt4Qt5 && qmake && make -j ${FLATPAK_BUILDER_N_JOBS:-`nproc`}",
+                        "make install -C Qt4Qt5",
+                        "sip-build --target-dir /app/lib/python3.8/site-packages/ --no-make --qsci-features-dir Qt4Qt5/features --qsci-include-dir Qt4Qt5 --qsci-library-dir Qt4Qt5",
+                        "echo \"LIBS += /app/lib/libqscintilla2_qt5.so\" >> build/Qsci/Qsci.pro",
+                        "echo \"QT += widgets printsupport\" >> build/Qsci/Qsci.pro",
+                        "cd build && make -j ${FLATPAK_BUILDER_N_JOBS:-`nproc`} && make install"
                     ]
                 },
                 {
@@ -634,6 +717,24 @@
                             "url": "https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protobuf-cpp-3.13.0.tar.gz",
                             "sha256": "f8a547dfe143a9f61fadafba47fa6573713a33cb80909307c1502e26e1102298"
                         }
+                    ]
+                },
+                {
+                    "name" : "pyqt5-config",
+                    "buildsystem" : "simple",
+                    "build-commands" : [
+                        "python3 setup.py build",
+                        "python3 setup.py install --prefix=/app --root=/"
+                    ],
+                    "sources" : [
+                        {
+                            "type" : "archive",
+                            "url" : "https://pypi.python.org/packages/source/p/pyqtconfig/pyqtconfig-0.9.1.tar.gz",
+                            "sha256" : "f11fe407a50bb02b47293cd2e72ff882df97321c9adf5ec53223c1a7ed5f203a"
+                        }
+                    ],
+                    "cleanup" : [
+                        "*"
                     ]
                 }
             ]
